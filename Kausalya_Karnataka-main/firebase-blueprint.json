@@ -1,0 +1,73 @@
+{
+  "entities": {
+    "Worker": {
+      "title": "Worker Profile",
+      "description": "Represents a skilled laborer's portfolio and profile.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Full name of the worker" },
+        "category": { "type": "string", "description": "Trade category (e.g., Electrician, Plumber)" },
+        "bio": { "type": "string", "description": "Short bio or experience description" },
+        "profileImageUrl": { "type": "string", "format": "url", "description": "URL to the worker's headshot" },
+        "rating": { "type": "number", "description": "Average star rating" },
+        "reviewCount": { "type": "number", "description": "Number of reviews received" },
+        "yearsExperience": { "type": "number", "description": "Number of years in the trade" },
+        "totalJobsDone": { "type": "number", "description": "Total jobs completed through the platform" },
+        "verified": { "type": "boolean", "description": "Whether the worker's work has been verified" },
+        "portfolio": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "imageUrl": { "type": "string", "format": "url" },
+              "description": { "type": "string" }
+            }
+          }
+        },
+        "services": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": { "type": "string" },
+              "price": { "type": "string", "description": "Fixed or starting price (e.g., '₹200', 'Starting at ₹500')" }
+            }
+          }
+        },
+        "location": { "type": "string", "description": "Local area/neighborhood" }
+      },
+      "required": ["name", "category"]
+    },
+    "Review": {
+      "title": "Review",
+      "description": "Customer feedback for a worker.",
+      "type": "object",
+      "properties": {
+        "workerId": { "type": "string" },
+        "userName": { "type": "string" },
+        "comment": { "type": "string" },
+        "rating": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["workerId", "comment", "rating"]
+    },
+    "HireRequest": {
+      "title": "Hire Request",
+      "description": "A notification request from a customer to a worker.",
+      "type": "object",
+      "properties": {
+        "workerId": { "type": "string" },
+        "customerName": { "type": "string" },
+        "customerPhone": { "type": "string" },
+        "serviceTitle": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "contacted", "completed"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  "firestore": {
+    "/workers": { "schema": "Worker", "description": "Collection of worker profiles" },
+    "/workers/{workerId}/reviews": { "schema": "Review", "description": "Subcollection of reviews for a specific worker" },
+    "/requests": { "schema": "HireRequest", "description": "Global collection of hire requests" }
+  }
+}

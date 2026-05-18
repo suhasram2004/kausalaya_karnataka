@@ -1,0 +1,10 @@
+{
+  "name": "Kaushalya-Karnataka",
+  "description": "A hyper-local 'Blue-Collar Portfolio' for skilled laborers like electricians, plumbers, and carpenters to showcase their work and fixed-price services.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

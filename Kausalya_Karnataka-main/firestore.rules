@@ -1,0 +1,58 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Helpers ---
+    function isSignedIn() { return request.auth != null; }
+    function isOwner(userId) { return isSignedIn() && request.auth.uid == userId; }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+
+    // --- Validation Blueprints ---
+    function isValidWorker(data) {
+      return data.name is string && data.name.size() <= 100 &&
+             data.category is string && data.category.size() <= 50 &&
+             data.bio is string && data.bio.size() <= 1000 &&
+             data.location is string && data.location.size() <= 100;
+    }
+
+    function isValidReview(data) {
+      return data.comment is string && data.comment.size() <= 500 &&
+             data.rating is number && data.rating >= 1 && data.rating <= 5 &&
+             data.userName is string && data.userName.size() <= 100;
+    }
+
+    // --- Collections ---
+    match /workers/{workerId} {
+      // Identity Vulnerability Guard: Prevent ID poisoning
+      allow get: if isValidId(workerId);
+      allow list: if true;
+      
+      allow create: if isOwner(workerId) && isValidWorker(incoming());
+      
+      allow update: if isOwner(workerId) && isValidWorker(incoming()) && (
+        incoming().diff(existing()).affectedKeys().hasOnly(['name', 'category', 'bio', 'location', 'services', 'portfolio', 'updatedAt'])
+      );
+
+      match /reviews/{reviewId} {
+        allow list: if true;
+        allow get: if isValidId(reviewId);
+        
+        // PII Isolation: Reviews are public feedback
+        allow create: if isSignedIn() && isValidReview(incoming()) && 
+                         incoming().workerId == workerId;
+      }
+    }
+
+    match /requests/{requestId} {
+      allow create: if true; // Public can request contact
+      allow read, update: if isSignedIn() && (isOwner(incoming().workerId) || isOwner(existing().workerId));
+    }
+  }
+}

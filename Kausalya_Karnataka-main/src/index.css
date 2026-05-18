@@ -1,0 +1,21 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+}
+
+@layer base {
+  body {
+    @apply antialiased selection:bg-orange-100 selection:text-orange-950;
+  }
+}
+
+.perspective-image {
+  perspective: 1000px;
+}
+
+.perspective-image img {
+  transform: rotateY(-5deg) rotateX(2deg);
+}
